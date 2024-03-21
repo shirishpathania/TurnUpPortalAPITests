@@ -1,0 +1,429 @@
+{
+	"info": {
+		"_postman_id": "8500bace-8016-40e3-8e42-61f2b0c8abfd",
+		"name": "TurnupPortal",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15290926"
+	},
+	"item": [
+		{
+			"name": "Turnup Portal Home Page",
+			"protocolProfileBehavior": {
+				"disableCookies": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://horse.industryconnect.io/",
+					"protocol": "http",
+					"host": [
+						"horse",
+						"industryconnect",
+						"io"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Time and Material records",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/TimeMaterial/GetTMs?_=1697702554511",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"TimeMaterial",
+						"GetTMs"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": null,
+							"disabled": true
+						},
+						{
+							"key": "_",
+							"value": "1697702554511"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new Time and Material record",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"data = JSON.parse(responseBody);\r",
+							"tmID = data.Id;\r",
+							"\r",
+							"pm.environment.set(\"id\", tmID);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"companytimematerial\": {\r\n        \"__RequestVerificationToken\": \"EDOTDWo5Rntz4kv5EdY7_jY8IVX5vwl5kepqQhg5XkVDIvf_uOYHxIK-GBSd_nBEbt8tXw_rhJ4r0m6HrPyOvp3fM9_TiTcnQkuRcVAOOtc1\",\r\n        \"Id\": \"0\",\r\n        \"IsActive\": \"True\",\r\n        \"CreatedOn\": \"7/26/2023 8:47:20 AM\",\r\n        \"CreatedBy\": \"default\",\r\n        \"CompanyId\": \"8\",\r\n        \"NewFileName\": \"\",\r\n        \"OldFileName\": \"\",\r\n        \"TypeCode\": \"{{typecode}}\",\r\n        \"Code\": \"{{code}}\",\r\n        \"Description\": \"{{description}}\",\r\n        \"IsTaxInclusive\": true,\r\n        \"Price\": {{price}}\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/TimeMaterial/Edit",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"TimeMaterial",
+						"Edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify Time and Material record got created",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseJson = pm.response.json();\r",
+							"const responseSize = Object.keys(responseJson).length;\r",
+							"console.log(responseSize);\r",
+							"\r",
+							"pm.test(\"Verify new TM Record is created\", function () {\r",
+							"    const responseJson = pm.response.json();\r",
+							"\r",
+							"    const responseSize = Object.keys(responseJson).length;\r",
+							"    console.log(responseSize);\r",
+							"\r",
+							"    for (let i = 0 ; i < responseSize; i++) {\r",
+							"\r",
+							"        if (responseJson[i].Id == parseInt(pm.environment.get(\"id\"))) {\r",
+							"\r",
+							"            pm.expect(responseJson[i].Id).to.eq(parseInt(pm.environment.get(\"id\")));\r",
+							"            pm.expect(responseJson[i].TypeCode).to.eq(pm.environment.get(\"typecode\"));\r",
+							"            pm.expect(responseJson[i].Code).to.eq(pm.environment.get(\"code\"));\r",
+							"            pm.expect(responseJson[i].Description).to.eq(pm.environment.get(\"description\"));\r",
+							"            pm.expect(responseJson[i].Price).to.eq(parseFloat(pm.environment.get(\"price\")));\r",
+							"            console.log(\"Record is created\");\r",
+							"            break;\r",
+							"        }\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/TimeMaterial/GetTMs?_=1689644326234",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"TimeMaterial",
+						"GetTMs"
+					],
+					"query": [
+						{
+							"key": "_",
+							"value": "1689644326234"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit existing Time and Material record",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"\r",
+							"const id = responseJson.Id;\r",
+							"pm.environment.set(\"id\", id);\r",
+							"\r",
+							"const typecode = responseJson.TypeCode;\r",
+							"pm.environment.set(\"typecode\", typecode);\r",
+							"\r",
+							"const code = responseJson.Code;\r",
+							"pm.environment.set(\"code\", code);\r",
+							"\r",
+							"const description = responseJson.Description;\r",
+							"pm.environment.set(\"description\", description);\r",
+							"\r",
+							"const price = responseJson.Price;\r",
+							"pm.environment.set(\"price\", price);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"companytimematerial\": {\r\n        \"__RequestVerificationToken\": \"2LesHrNDYti2mSgZNRfy59bhTxMSYVQoPzIBXU6aMrq-JXRICBV1epl2Ucp5J5yYJl04FMYZl-4DM9eryfBQQ1YEL2YoMkBmNpzcNj8iF0Q1\",\r\n        \"Id\": {{id}},\r\n        \"IsActive\": \"True\",\r\n        \"CreatedOn\": \"7/18/2023 1:48:59 AM\",\r\n        \"CreatedBy\": \"default\",\r\n        \"CompanyId\": \"8\",\r\n        \"NewFileName\": \"\",\r\n        \"OldFileName\": \"\",\r\n        \"TypeCode\": \"M\",\r\n        \"Code\": \"XYZ123\",\r\n        \"Description\": \"Gaming Mouse\",\r\n        \"IsTaxInclusive\": true,\r\n        \"Price\": 200\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/TimeMaterial/Edit",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"TimeMaterial",
+						"Edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify Time and Material record got updated",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Record is updated\", function () {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    const responseSize = Object.keys(responseJson).length;\r",
+							"    console.log(parseInt(pm.environment.get(\"id\")));\r",
+							"\r",
+							"    for (let i = 0 ; i < responseSize; i++) {\r",
+							"\r",
+							"        if (responseJson[i].Id == parseInt(pm.environment.get(\"id\"))) {\r",
+							"\r",
+							"            pm.expect(responseJson[i].Id).to.eq(parseInt(pm.environment.get(\"id\")));\r",
+							"            pm.expect(responseJson[i].TypeCode).to.eq(pm.environment.get(\"typecode\"));\r",
+							"            pm.expect(responseJson[i].Code).to.eq(pm.environment.get(\"code\"));\r",
+							"            pm.expect(responseJson[i].Description).to.eq(pm.environment.get(\"description\"));\r",
+							"            pm.expect(responseJson[i].Price).to.eq(parseFloat(pm.environment.get(\"price\")));\r",
+							"            console.log(\"Record is updated\");\r",
+							"            break;\r",
+							"        }\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/TimeMaterial/GetTMs?_=1689644326234",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"TimeMaterial",
+						"GetTMs"
+					],
+					"query": [
+						{
+							"key": "_",
+							"value": "1689644326234"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete existing Time and Material record",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "id",
+							"value": "{{id}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/TimeMaterial/Delete",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"TimeMaterial",
+						"Delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify Time and Material record got deleted",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Record is deleted\", function () {\r",
+							"\r",
+							"    const responseJson = pm.response.json();\r",
+							"    const responseSize = Object.keys(responseJson).length;\r",
+							"\r",
+							"    for (let i = 0 ; i < responseSize; i++) {\r",
+							"\r",
+							"        if (responseJson[i].Id == pm.environment.get(\"id\")) {\r",
+							"            console.log(\"Record still exists\");\r",
+							"            pm.expect.fail();\r",
+							"            break;\r",
+							"        }\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/TimeMaterial/GetTMs?_=1689644326234",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"TimeMaterial",
+						"GetTMs"
+					],
+					"query": [
+						{
+							"key": "_",
+							"value": "1689644326234"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
